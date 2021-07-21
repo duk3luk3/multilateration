@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from statistics import mean
 from math import cos, pi, sqrt
+from typing import List, Union
 
 EARTH_CIRCUMF = 40074000
 
@@ -10,9 +11,9 @@ EARTH_CIRCUMF = 40074000
 class LatLong:
     lat: float
     long: float
-    label: str = None
+    label: Union[str, None] = None
 
-LatLongs = list[LatLong]
+LatLongs = List[LatLong]
 
 @dataclass
 class Point:
