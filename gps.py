@@ -31,8 +31,8 @@ def get_mean_latlong(coords: LatLongs):
 
 def LatLongToPoint(coord: LatLong, ref: LatLong):
   return Point(
-          x = (coord.lat - ref.lat) / 360 * EARTH_CIRCUMF,
-          y = (coord.long - ref.long) / 360 * cos(ref.lat*pi/180) * EARTH_CIRCUMF,
+          x = (coord.long - ref.long) / 360 * cos(ref.lat*pi/180) * EARTH_CIRCUMF,
+          y = (coord.lat - ref.lat) / 360 * EARTH_CIRCUMF,
           )
 
 def PointToLatLong(coord: Point, ref: LatLong):
