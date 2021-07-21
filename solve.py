@@ -19,13 +19,19 @@ def records_to_np(records: List[ReceiveRecord]):
 
     return rec_times, towers, mean_latlong
 
-def solve(rec_times, towers):
+def solve(rec_times, towers, mean = None):
 
     v = 3e8
 
     c = np.argmin(rec_times)
     p_c = np.expand_dims(towers[c], axis=0)
     t_c = rec_times[c]
+
+    # calc bounding bix
+    #min_x = np.min([t[0] for t in towers])
+    #max_x = np.max([t[0] for t in towers])
+    #min_y = np.min([t[1] for t in towers])
+    #max_y = np.max([t[1] for t in towers])
 
     # Remove the c tower to allow for vectorization.
     all_p_i = np.delete(towers, c, axis=0)
@@ -40,10 +46,10 @@ def solve(rec_times, towers):
         )
 
     # Initial guess.
-    x_init = [0, 0]
+    x_init = [mean.x, mean.y] if mean else [0,0]
 
     # Find a value of x such that eval_solution is minimized.
-    # Remember the receive times have error added to them: rec_time_noise_stdd.
+    #res = least_squares(eval_solution, x_init, jac='3-point', bounds=np.array([[min_x, min_y], [max_x, max_y]]), method='dogbox')
     res = least_squares(eval_solution, x_init)
 
     return res
@@ -51,7 +57,9 @@ def solve(rec_times, towers):
 def solve_gps(records: List[ReceiveRecord]):
     rec_times, towers, mean_latlong = records_to_np(records)
 
-    solution = solve(rec_times, towers)
+    mean_pt = LatLongToPoint(mean_latlong, mean_latlong)
+
+    solution = solve(rec_times, towers, mean_pt)
 
     solution_gps = PointToLatLong(Point(solution.x[0], solution.x[1]), mean_latlong)
 
