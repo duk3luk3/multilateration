@@ -2,7 +2,7 @@ import gps
 
 from dataclasses import dataclass
 from typing import List
-from dataclasses_serialization.json import JSONStrSerializer
+from dataclasses_serialization.json import JSONStrSerializer, JSONSerializer
 
 import numpy as np
 
@@ -18,6 +18,11 @@ class ReceiveRecords:
 def load_records(f):
     rcs = JSONStrSerializer.deserialize(ReceiveRecords, f.read())
     return rcs.records
+
+def load_records_obj(o):
+    rcs = JSONSerializer.deserialize(ReceiveRecords, o)
+    return rcs.records
+
 
 def save_records(records: List[ReceiveRecord], f):
     rcs = ReceiveRecords(records)

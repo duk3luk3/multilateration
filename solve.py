@@ -63,4 +63,4 @@ def solve_gps(records: List[ReceiveRecord]):
 
     solution_gps = PointToLatLong(Point(solution.x[0], solution.x[1]), mean_latlong)
 
-    return solution_gps
+    return solution_gps, solution
