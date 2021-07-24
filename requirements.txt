@@ -1,0 +1,16 @@
+click==8.0.1
+dataclasses==0.6
+dataclasses-serialization==1.3.1
+Flask==2.0.1
+itsdangerous==2.0.1
+Jinja2==3.0.1
+MarkupSafe==2.0.1
+more-properties==1.1.1
+mypy-extensions==0.4.3
+numpy==1.21.0
+scipy==1.7.0
+toolz==0.11.1
+toposort==1.6
+typing-extensions==3.10.0.0
+typing-inspect==0.7.1
+Werkzeug==2.0.1

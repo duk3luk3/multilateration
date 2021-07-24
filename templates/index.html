@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<title>Leaflet</title>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+		crossorigin=""/>
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin=""></script>
+		<style type="text/css">
+#mapid { height: 75%; }
+#content { height: 25%; }
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+var mymap;
+
+	function load_map() {
+mymap = L.map('mapid').setView([51.505, -0.09], 13);
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: 'pk.eyJ1IjoiZHVrM2x1azMiLCJhIjoiY2tyaHE1bjZqMHZoZDMwcDY4aXhpdHFvYiJ9.o-msoPAZeBQiWEo7ENRDgw'
+}).addTo(mymap);
+}
+
+// Example POST method implementation:
+async function postData(url = '', data = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json'
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    //body: JSON.stringify(data) // body data type must match "Content-Type" header
+    body: data // body data type must match "Content-Type" header
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
+
+		function fclick() {
+			const ar = document.getElementById('maintext');
+			postData('/solve', ar.value)
+			  .then(data => {
+			    console.log(data); // JSON data parsed by `data.json()` call
+const rxs = data.input;
+const tx = data.solution;
+
+var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var latlng = L.latLng(tx.lat, tx.long);
+marker = L.marker(latlng, {icon: greenIcon}).addTo(mymap);
+
+console.log(rxs);
+
+var rxll = rxs.map(x => L.latLng(x.receiverCoord.lat, x.receiverCoord.long));
+
+console.log(rxll);
+
+for (var rxl of rxll) {
+  L.marker(rxl).addTo(mymap);
+}
+
+var bounds = L.latLngBounds(rxll);
+
+mymap.fitBounds(bounds);
+			  });
+		}
+		</script>
+		<div id="content">
+				<button onclick="javascript:fclick();">Submit</button>
+			<form id="form">
+				<textarea cols="100" rows="10" name="text" id="maintext"></textarea>
+			</form>
+		</div>
+		<div id="mapid"></div>
+		<script type="text/javascript">
+			load_map();
+		</script>
+	</body>
+</html>
