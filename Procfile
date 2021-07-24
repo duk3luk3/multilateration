@@ -1,2 +1,1 @@
-release: pip install -r requirements.txt
-web: python app.py
+web: gunicorn app:app
