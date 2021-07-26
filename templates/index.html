@@ -9,7 +9,17 @@
 		crossorigin=""></script>
 		<style type="text/css">
 #mapid { height: 75%; }
-#content { height: 25%; }
+#content {
+height: 25%;
+display:grid;
+grid-template-columns: repeat(2, 1fr);
+}
+#one {
+grid-column: 1;
+}
+#two {
+grid-column: 2;
+}
 		</style>
 	</head>
 	<body>
@@ -49,12 +59,9 @@ async function postData(url = '', data = {}) {
   return response.json(); // parses JSON response into native JavaScript objects
 }
 
-
-		function fclick() {
-			const ar = document.getElementById('maintext');
-			postData('/solve', ar.value)
-			  .then(data => {
-			    console.log(data); // JSON data parsed by `data.json()` call
+function handle_solve(data)
+			{
+			console.log(data); // JSON data parsed by `data.json()` call
 const rxs = data.input;
 const tx = data.solution;
 
@@ -83,14 +90,47 @@ for (var rxl of rxll) {
 var bounds = L.latLngBounds(rxll);
 
 mymap.fitBounds(bounds);
-			  });
+}
+
+
+		function fclick() {
+			const ar = document.getElementById('maintext');
+			postData('/solve', ar.value)
+			  .then(data => handle_solve(data));
+		}
+		function tclick() {
+			const data = 
+{"records":
+[
+{"receiverCoord": {"lat": parseFloat(document.getElementById('rx00').value), "long": parseFloat(document.getElementById('rx01').value), "label": null}, "ts": parseFloat(document.getElementById('rx02').value)},
+ {"receiverCoord": {"lat": parseFloat(document.getElementById('rx10').value), "long": parseFloat(document.getElementById('rx11').value), "label": null}, "ts": parseFloat(document.getElementById('rx12').value)},
+ {"receiverCoord": {"lat": parseFloat(document.getElementById('rx20').value), "long": parseFloat(document.getElementById('rx21').value), "label": null}, "ts": parseFloat(document.getElementById('rx22').value)}
+]
+};
+			postData('/solve', JSON.stringify(data))
+			  .then(data => handle_solve(data));
 		}
 		</script>
 		<div id="content">
-				<button onclick="javascript:fclick();">Submit</button>
+			<div id="one">
+			JSON
 			<form id="form">
-				<textarea cols="100" rows="10" name="text" id="maintext"></textarea>
+				<textarea cols="100" rows="5" name="text" id="maintext"></textarea>
 			</form>
+				<button onclick="javascript:fclick();">Submit</button>
+			</div>
+			<div id="two">
+			Form
+				<table>
+				<form id="form2">
+					<tr><th></th><th>Lat</th><th>Long</th><th>Time(s)</th></tr>
+					<th>RX1</th><td><input id="rx00"></td><td><input id="rx01"></td><td><input id="rx02"></td></tr>
+					<th>RX2</th><td><input id="rx10"></td><td><input id="rx11"></td><td><input id="rx12"></td></tr>
+					<th>RX3</th><td><input id="rx20"></td><td><input id="rx21"></td><td><input id="rx22"></td></tr>
+				</form>
+				</table>
+				<button onclick="javascript:tclick();">Submit</button>
+			</div>
 		</div>
 		<div id="mapid"></div>
 		<script type="text/javascript">
