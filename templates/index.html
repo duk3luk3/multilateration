@@ -78,6 +78,9 @@ var greenIcon = new L.Icon({
 var latlng = L.latLng(tx.lat, tx.long);
 marker = L.marker(latlng, {icon: greenIcon}).addTo(mymap);
 
+marker.bindPopup("" + tx.lat + ", <br>" + tx.long).openPopup();
+
+
 console.log(rxs);
 
 var rxll = rxs.map(x => L.latLng(x.receiverCoord.lat, x.receiverCoord.long));
@@ -89,7 +92,10 @@ for (var rxl of rxll) {
 }
 
 for (var locus of loci) {
-  L.circleMarker([locus.lat, locus.long],{radius:3}).addTo(mymap);
+  var lll = locus.map(x => L.latLng(x.lat, x.long));
+  //console.log(lll);
+  L.polyline(lll).addTo(mymap);
+  //L.circleMarker([locus.lat, locus.long],{radius:3}).addTo(mymap);
 }
 
 var bounds = L.latLngBounds(rxll);

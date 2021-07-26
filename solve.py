@@ -79,7 +79,7 @@ def solve_gps(records: List[ReceiveRecord]):
           pt = Point(zipped[0], zipped[1])
           if PointDistance(pt, solution_pt) < 5000:
             locus_gps.append(PointToLatLong(Point(zipped[0], zipped[1]), mean_latlong))
-        loci_gps = loci_gps + locus_gps
+        loci_gps.append(locus_gps)
 
 
     return solution_gps, solution, loci_gps
