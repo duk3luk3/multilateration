@@ -3,7 +3,8 @@ import math
 from scipy.optimize import least_squares
 
 from data import ReceiveRecord
-from gps import get_mean_latlong, LatLongToPoint, PointToLatLong, Point
+from gps import get_mean_latlong, LatLongToPoint, PointToLatLong, Point, PointDistance
+from multilaterate import get_loci
 from typing import List
 
 def records_to_np(records: List[ReceiveRecord]):
@@ -27,11 +28,13 @@ def solve(rec_times, towers, mean = None):
     p_c = np.expand_dims(towers[c], axis=0)
     t_c = rec_times[c]
 
-    # calc bounding bix
-    #min_x = np.min([t[0] for t in towers])
-    #max_x = np.max([t[0] for t in towers])
-    #min_y = np.min([t[1] for t in towers])
-    #max_y = np.max([t[1] for t in towers])
+    # calc bounding box
+    min_x = np.min([t[0] for t in towers])
+    max_x = np.max([t[0] for t in towers])
+    min_y = np.min([t[1] for t in towers])
+    max_y = np.max([t[1] for t in towers])
+
+    max_d = np.max([max_x-min_x, max_y-min_y])
 
     # Remove the c tower to allow for vectorization.
     all_p_i = np.delete(towers, c, axis=0)
@@ -50,17 +53,33 @@ def solve(rec_times, towers, mean = None):
 
     # Find a value of x such that eval_solution is minimized.
     #res = least_squares(eval_solution, x_init, jac='3-point', bounds=np.array([[min_x, min_y], [max_x, max_y]]), method='dogbox')
-    res = least_squares(eval_solution, x_init)
+    solution = least_squares(eval_solution, x_init)
 
-    return res
+    loci = get_loci(rec_times, towers, v, 10, max_d)
+
+    return solution, loci
 
 def solve_gps(records: List[ReceiveRecord]):
     rec_times, towers, mean_latlong = records_to_np(records)
 
     mean_pt = LatLongToPoint(mean_latlong, mean_latlong)
 
-    solution = solve(rec_times, towers, mean_pt)
+    solution, loci = solve(rec_times, towers, mean_pt)
 
-    solution_gps = PointToLatLong(Point(solution.x[0], solution.x[1]), mean_latlong)
+    solution_pt = Point(solution.x[0], solution.x[1])
 
-    return solution_gps, solution
+    solution_gps = PointToLatLong(solution_pt, mean_latlong)
+
+    loci_gps = []
+
+    for locus in loci:
+        locus_zipped = zip(locus[0], locus[1])
+        locus_gps = []
+        for zipped in locus_zipped:
+          pt = Point(zipped[0], zipped[1])
+          if PointDistance(pt, solution_pt) < 5000:
+            locus_gps.append(PointToLatLong(Point(zipped[0], zipped[1]), mean_latlong))
+        loci_gps = loci_gps + locus_gps
+
+
+    return solution_gps, solution, loci_gps

@@ -49,6 +49,12 @@ def PointDistance(point1: Point, point2: Point):
 
     return dst
 
+def LatLongDistance(l1: LatLong, l2: LatLong):
+    p1 = LatLongToPoint(l1, l1)
+    p2 = LatLongToPoint(l2, l1)
+
+    return PointDistance(p1, p2)
+
 
 def get_latlong_stats(coords: LatLongs):
     ref = get_mean_latlong(coords)

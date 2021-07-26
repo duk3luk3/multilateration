@@ -64,6 +64,7 @@ function handle_solve(data)
 			console.log(data); // JSON data parsed by `data.json()` call
 const rxs = data.input;
 const tx = data.solution;
+const loci = data.loci
 
 var greenIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -85,6 +86,10 @@ console.log(rxll);
 
 for (var rxl of rxll) {
   L.marker(rxl).addTo(mymap);
+}
+
+for (var locus of loci) {
+  L.circleMarker([locus.lat, locus.long],{radius:3}).addTo(mymap);
 }
 
 var bounds = L.latLngBounds(rxll);

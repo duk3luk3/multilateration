@@ -24,11 +24,12 @@ def multilaterate():
     d = request.get_json()
     records = data.load_records_obj(d)
 
-    solve_gps, solution = solve.solve_gps(records)
+    solve_gps, solution, loci = solve.solve_gps(records)
 
     return dict(
             input=records,
-            solution=solve_gps
+            solution=solve_gps,
+            loci=loci
             )
 
 if __name__ == "__main__":
